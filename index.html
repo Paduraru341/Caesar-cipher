@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fi">
+
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Падурару</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: rgb(30,30,32);
+      background: linear-gradient(175deg, rgba(30,30,32,1) 45%, rgba(72,35,32,1) 79%, rgba(112,40,33,1) 99%, rgba(136,43,33,1) 100%);
+      color: white;
+      font-family: 'Open Sans', sans-serif;
+      min-height: 100vh;
+      padding: 3%;
+    }
+    
+    section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 100px;
+      min-height: 85vh;
+    }
+    
+    .red--text {
+      color: #dc3522;
+    }
+
+    h1 {
+      text-align: center;
+      color: #dc3522;
+    }
+    
+    h3 {
+      max-width: 600px;
+      text-align: center;
+    }
+    
+    .encryption-block {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
+    }
+    
+    .encryption-block textarea {
+      width: 100%;
+    }
+    
+    .encryption-block button {
+      margin: 10px auto;
+      display: block;
+      color: white;
+      background-color: #dc3522;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-size: 18px;
+      box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.15);
+    }
+    
+    .encryption-block button:hover {
+      cursor: pointer;
+      color: #dc3522;
+      background-color: white;
+      box-shadow: 0 0 10px 10px rgba(220, 53, 34, 0.15);
+    }
+    
+    .hidden {
+      opacity: 0;
+    }
+  </style>
+</head>
+
+<body>
+<section>
+  <h1>Шифр Цезаря</h1>
+  <h3>Простий <span class="red--text">JavaScript</span> код, який виконує шифрування та дешифрування текстів за допомогою шифру Юлія Цезаря (також відомого як шифр зсуву).</h3>
+  <div>
+    <label>Вкажіть значення ключа зміщення:</label>
+    <input value="3" type="number" min="1" max="32" id="encryptionRate"/>
+  </div>
+  <div class="encryption-block">
+    <div>
+      <div>
+        <p>Введіть текст для шифрування:</p>
+        <textarea id="textEncrypt" name="textEncrypt" rows="5"></textarea>
+        <button id="btnEncrypt">Шифрувати</button>
+      </div>
+      <div class="textEncrypted hidden">
+        <p>Результат шифрування:</p>
+        <code id="textEncrypted"></code>
+      </div>
+    </div>
+    <div>
+      <div>
+        <p>Введіть текст для дешифрування:</p>
+        <textarea id="textDecrypt" name="textEncrypt" rows="5"></textarea>
+        <button id="btnDecrypt">Дешифрувати</button>
+      </div>
+      <div class="textDecrypted hidden">
+        <p>Результат дешифрування:</p>
+        <code id="textDecrypted"></code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  let alphabetUA = 'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ'
+  let alphabetEN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  alphabetUA = alphabetUA + alphabetUA.toLocaleLowerCase()
+  alphabetUA = alphabetUA.split('')
+  alphabetEN = alphabetEN + alphabetEN.toLocaleLowerCase()
+  alphabetEN = alphabetEN.split('')
+  
+  
+  let encryption = document.getElementById('encryptionRate');
+  let textEncrypt = document.getElementById('textEncrypt');
+  let textDecrypt = document.getElementById('textDecrypt');
+  
+  let textEncryptedBlock = document.getElementsByClassName('textEncrypted')[0]
+  let textEncryptedCode = document.getElementById('textEncrypted')
+  let textDecryptedBlock = document.getElementsByClassName('textDecrypted')[0]
+  let textDecryptedCode = document.getElementById('textDecrypted')
+  
+  let encrypt = document.getElementById("btnEncrypt");
+  encrypt.addEventListener("click", function(event){
+    let textEncrypted = ''
+    if (textEncrypt.value) {
+      textEncrypted = onEncrypt(textEncrypt.value, Number(encryption.value))
+    }
+    if (textEncrypted.length) {
+      textEncryptedBlock.classList.remove('hidden')
+      textEncryptedCode.innerHTML = textEncrypted
+    }
+    else {
+      textEncryptedBlock.classList.add('hidden')
+    }
+  })
+  
+  let decrypt = document.getElementById("btnDecrypt");
+  decrypt.addEventListener("click", function(event){
+    
+    let textDecrypted = ''
+    if (textDecrypt.value) {
+      textDecrypted = onEncrypt(textDecrypt.value, Number(encryption.value) * -1)
+    }
+    if (textDecrypted.length) {
+      textDecryptedBlock.classList.remove('hidden')
+      textDecryptedCode.innerHTML = textDecrypted
+    }
+    else {
+      textDecryptedBlock.classList.add('hidden')
+    }
+  })
+  
+  function onEncrypt(text, key) {
+    let result = ''
+    let index = 0
+    for (let i in text) {
+      if (alphabetUA.indexOf(text[i]) > -1) {
+        index = alphabetUA.indexOf(text[i]) + key
+        if (index > alphabetUA.length) {
+          index = index - alphabetUA.length
+        }
+        if (index < 0) {
+          index = alphabetUA.length + index
+        }
+        result = result + alphabetUA[index]
+      }
+      else if (alphabetEN.indexOf(text[i]) > -1) {
+        index = alphabetEN.indexOf(text[i]) + key
+        if (index > alphabetEN.length) {
+          index = index - alphabetEN.length
+        }
+        if (index < 0) {
+          index = alphabetEN.length + index
+        }
+        result = result + alphabetEN[index]
+      }
+      else result = result + text[i]
+    }
+    return result
+  }
+</script>
+</body>
+
+</html>
